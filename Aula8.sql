@@ -68,8 +68,12 @@ select * from CLIENTE
 
 		insert into VENDAS values (1,'2019-11-12',1,100,1)
 
-		
-create trigger CALCULACOMISSAOVENDA on VENDAS for insert
+		select * from VENDASITEMS
+
+		insert into VENDASITEMS values(1,1,2,2.4,4)
+ 		
+ 
+alter trigger CALCULACOMISSAOVENDA on VENDAS for insert
 as 
 begin
 	declare @nrovenda int
@@ -84,6 +88,40 @@ begin
 	insert into COMISSAO (MOMENTO,VENDEDOR,VENDA,TIPOCOMISSAO,VALORCOMISSAO,STATUSCOMISSAO)
 		values (CURRENT_TIMESTAMP,@codigo,@nrovenda,'v',@valortotal*@comissao,'A')
 
+
 end
-	
 	select * from COMISSAO
+
+	select * from PRODUTO
+
+alter  trigger ComissaoVendasItems on VENDASITEMS for insert
+as
+begin
+		declare @codigo int
+		declare @nome  varchar
+		declare @comissao float 
+		declare @valor float      
+		declare @nrovenda int 
+	    declare @valortotal float
+		declare @vendedor varchar   
+		
+		select NROVENDA from inserted
+
+		select @vendedor =VENDEDOR from VENDAS where NROVENDA=(select NROVENDA from inserted) 
+
+		select @comissao =COMISSAO from PRODUTO where CODIGO=(select CODIGO from inserted)
+
+		select @nrovenda =NROVENDA from VENDASITEMS where NROVENDA=(select NROVENDA from inserted) 
+
+		select @comissao =COMISSAO from VENDEDOR where CODIGO=(select CODIGO from inserted) 
+ 
+			insert into COMISSAO (MOMENTO,VENDEDOR,VENDA,TIPOCOMISSAO,VALORCOMISSAO,STATUSCOMISSAO) 
+
+			values (CURRENT_TIMESTAMP,@vendedor,@nrovenda,'p',@valortotal*@comissao,'A')
+	
+	end
+
+
+	select *from COMISSAO
+
+	select *from PRODUTO
